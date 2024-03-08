@@ -1,26 +1,25 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import "./App.css";
+import AppRouter from "./Router";
 
 const serveurUrl = import.meta.env.VITE_API_SERVER_URL;
 
 const App = () => {
   const [token, setToken] = useState<string | null>();
-  const {
-    isLoading,
-    error,
-    user,
-    loginWithRedirect,
-    logout,
-    isAuthenticated,
-    getAccessTokenSilently,
-  } = useAuth0();
+  const { isLoading, error, user, loginWithRedirect, logout, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
-    if (user != null) {
+    if (user) {
       handleToken();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (token) {
+      handleInit();
+    }
+  }, [token]);
 
   const handleLogout = (): void => {
     logout({ logoutParams: { returnTo: window.location.origin } });
@@ -31,48 +30,19 @@ const App = () => {
     setToken(tokenFromAuth);
   };
 
-  const handleFetchPublic = async () => {
-    // without authentication
+  const handleInit = async () => {
     try {
-      const responseWithAuth = await fetch(serveurUrl + "/public", {
+      await fetch(serveurUrl + "/users/init", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const jsonDataPrivate = await responseWithAuth.json();
-      console.log(jsonDataPrivate);
     } catch (error) {
       console.error("une erreur");
     }
   };
-  const handleFetchPrivate = async () => {
-    // with authentication
-    try {
-      const responseWithAuth = await fetch(serveurUrl + "/private", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const jsonDataPrivate = await responseWithAuth.json();
-      console.log(jsonDataPrivate);
-    } catch (error) {
-      console.log("oh oh bummer");
-    }
-  };
-  const handleFetchUsers = async () => {
-    // with authentication
-    try {
-      const responseWithAuth = await fetch(serveurUrl + "/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const jsonDataPrivate = await responseWithAuth.json();
-      console.log(jsonDataPrivate);
-    } catch (error) {
-      console.log("oh oh bummer");
-    }
-  };
+
+  console.log(user);
 
   if (isLoading) {
     return <p>loading...</p>;
@@ -87,25 +57,14 @@ const App = () => {
   if (!isAuthenticated) {
     return (
       <>
-        <button onClick={() => loginWithRedirect()}>Log In</button>
-        <br />
-        <button onClick={() => handleFetchPublic()}>Fetch public</button>
-        <br />
-        <button onClick={() => handleFetchPrivate()}>Fetch private</button>
+        <button onClick={() => loginWithRedirect()}> Login</button>
       </>
     );
   }
 
   return (
     <>
-      <p>{user?.email}</p>
-      <button onClick={() => logout()}>Log Out</button>
-      <br />
-      <button onClick={() => handleFetchPublic()}>Fetch public</button>
-      <br />
-      <button onClick={() => handleFetchPrivate()}>Fetch private</button>
-      <br />
-      <button onClick={() => handleFetchUsers()}>Fetch users</button>
+      <AppRouter />
     </>
   );
 };
