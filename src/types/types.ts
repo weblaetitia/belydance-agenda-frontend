@@ -11,6 +11,7 @@ export type Event = {
   endDate: string;
   isFree: boolean;
   vendorUrl: string;
+  websiteUrl: string;
   organizerEmail: string;
   eventDescription: string;
   usersId: string;

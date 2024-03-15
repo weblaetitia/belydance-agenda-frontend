@@ -1,6 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Event } from "../types/types";
 import { serverUrl } from "../utils/server";
 
@@ -8,6 +9,7 @@ const EventDetail = () => {
   const [event, setEvent] = useState<Event | null>();
   const { eventID } = useParams();
   const { getAccessTokenSilently } = useAuth0();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (eventID != null) getEventDetail(eventID);
@@ -63,6 +65,7 @@ const EventDetail = () => {
         <li>{event.organizerEmail}</li>
         <li>{event.vendorUrl}</li>
       </ul>
+      <Link onClick={() => navigate("/events/update/" + eventID)}>Update Event</Link>
     </div>
   );
 };

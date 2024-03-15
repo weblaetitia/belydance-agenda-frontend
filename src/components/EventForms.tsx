@@ -1,8 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { Button, Checkbox, FormLabel, HStack, Input, Text, Textarea } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Artist, Event } from "../types/types";
 import { serverUrl } from "../utils/server";
+import ArtistModal from "./ArtistModal";
 
 type EventFormDetailsProps = {
   event?: Event;
@@ -10,8 +12,9 @@ type EventFormDetailsProps = {
 };
 
 export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNext }) => {
-  const [artistSelected, setArtistSelected] = useState<Artist[] | null>();
+  const [artistSelected, setArtistSelected] = useState<Artist[] | undefined>(event ? event.artists : undefined);
   const [artistsFound, setArtistsFound] = useState<Artist[] | null>();
+  const [artistModalOpen, setArtistModalOpen] = useState(false);
   const { getAccessTokenSilently } = useAuth0();
 
   const {
@@ -72,87 +75,114 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
     setArtistSelected(artistSelected?.filter((artist) => artist.id != artistToRemove.id));
   };
 
-  if (event) return <>TODO</>;
   return (
     <div>
       <form onSubmit={handleNext(onSubmit)}>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <label htmlFor="name">Event name:</label>
-          <input placeholder="Event name" {...register("name", { required: true })} />
+          {/* NAME */}
+          <FormLabel htmlFor="name">Event name:</FormLabel>
+          <Input placeholder="Event name" {...register("name", { required: true })} />
           {errors.name && <span>This field is required</span>}
-
-          <label htmlFor="facebookUrl">Facebook event URL:</label>
-          <input placeholder="Facebook event url" {...register("facebookUrl")} />
-
-          <label htmlFor="eventType">Event type:</label>
-          <select id="eventType" multiple {...register("eventTypes")}>
-            <option value="workshop">Workshop</option>
-            <option value="festival">Festival</option>
-            <option value="show">Show</option>
-            <option value="hafla">Hafla</option>
-            <option value="gathering">Gathering</option>
-          </select>
-
-          <label htmlFor="danceTypes">Choose a style:</label>
-          <select id="danceTypes" multiple {...register("danceTypes")}>
-            <option value="fusion">Fusion</option>
-            <option value="fcbd">FCBD®</option>
-            <option value="datura">Datura</option>
-            <option value="its">ITS</option>
-          </select>
-
-          <div>
-            <p>Artist</p>
-            {artistSelected &&
-              artistSelected.map((artist, i) => (
-                <React.Fragment key={i}>
-                  <div>
-                    {artist.name} <span onClick={() => onRemoveArtist(artist)}>X</span>
-                  </div>
-                </React.Fragment>
+          {/* FACEBOOK */}
+          <FormLabel htmlFor="facebookUrl">Facebook event URL:</FormLabel>
+          <Input placeholder="Facebook event url" {...register("facebookUrl")} />
+          {/* EVENT TYPE */}
+          <FormLabel htmlFor="eventType">Event type:</FormLabel>
+          <HStack>
+            <HStack>
+              <input type="checkbox" value="workshop" {...register("eventTypes")} />
+              <Text>Workshop</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="festival" {...register("eventTypes")} />
+              <Text>festival</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="show" {...register("eventTypes")} />
+              <Text>show</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="hafla" {...register("eventTypes")} />
+              <Text>hafla</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="gathering" {...register("eventTypes")} />
+              <Text>gathering</Text>
+            </HStack>
+          </HStack>
+          {/* STYLE */}
+          <FormLabel htmlFor="danceTypes">Choose a style:</FormLabel>
+          <HStack>
+            <HStack>
+              <input type="checkbox" value="fusion" {...register("danceTypes")} />
+              <Text>fusion</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="fcbd" {...register("danceTypes")} />
+              <Text>fcbd</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="datura" {...register("danceTypes")} />
+              <Text>datura</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="its" {...register("danceTypes")} />
+              <Text>its</Text>
+            </HStack>
+            <HStack>
+              <input type="checkbox" value="other" {...register("danceTypes")} />
+              <Text>other</Text>
+            </HStack>
+          </HStack>
+          {/* ARTISTS */}
+          <FormLabel htmlFor="search Artist">Artist:</FormLabel>
+          {artistSelected && (
+            <HStack>
+              {artistSelected.map((artist, i) => (
+                <Button key={i}>
+                  {artist.name} <span onClick={() => onRemoveArtist(artist)}>X</span>
+                </Button>
               ))}
-
-            <div>
-              <label htmlFor="search Artist">Search Artist</label>
-              <br />
-              <input placeholder="Type artist name" onChange={(e) => searchArtist(e.target.value)} />{" "}
-            </div>
-            {artistsFound && (
-              <ul>
-                {artistsFound.map((artist, i) => (
-                  <React.Fragment key={i}>
-                    <li>
-                      {artist.name} <button onClick={() => onSelectArtist(artist)}>Add</button>
-                    </li>
-                  </React.Fragment>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <label htmlFor="location">Event location:</label>
-          <input placeholder="location-id" {...register("location")} />
-
-          <label htmlFor="startDate">When does your event start and end? *</label>
-          <input type="date" id="startDate" {...register("startDate")} min="2023-03-01" />
-
-          <input type="date" id="endtDate" {...register("endDate")} min="2023-03-01" />
-
-          <p>Is your event free?</p>
-          <div>
-            <label htmlFor="isFree">yes it's free!</label>
-            <input type="checkbox" id="isFree" {...register("isFree")} />
-          </div>
-
-          <p>Tickets vendor url</p>
-          <input {...register("vendorUrl")} />
-
-          <p>Organizer email</p>
-          <input {...register("organizerEmail")} />
-
-          <input type="submit" title="Next" value="Next" />
+            </HStack>
+          )}
+          <Text>Search for artist in the database:</Text>
+          <Input placeholder="Type artist name" onChange={(e) => searchArtist(e.target.value)} />{" "}
+          {artistsFound && (
+            <ul>
+              {artistsFound.map((artist, i) => (
+                <li key={i}>
+                  {artist.name} <button onClick={() => onSelectArtist(artist)}>Add</button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Text>
+            Can't find your artist? <Button onClick={() => setArtistModalOpen(true)}>Create new</Button>
+          </Text>
+          {/* LOCATION */}
+          <FormLabel htmlFor="location">Event location:</FormLabel>
+          <Input placeholder="location-id" {...register("location")} />
+          {/* DATE */}
+          <FormLabel htmlFor="startDate">When does your event start and end? *</FormLabel>
+          <Input type="date" id="startDate" {...register("startDate")} min="2023-03-01" />
+          <Input type="date" id="endtDate" {...register("endDate")} min="2023-03-01" />
+          {/* FREE */}
+          <FormLabel htmlFor="isFree">Is your event free?</FormLabel>
+          <Checkbox {...register("isFree")}>Free</Checkbox>
+          {/* WEBSITE */}
+          <FormLabel htmlFor="websiteUrl">Website for more informations</FormLabel>
+          <Input {...register("websiteUrl")} />
+          {/* VENDOR */}
+          <FormLabel htmlFor="vendorUrl">Tickets vendor url</FormLabel>
+          <Input {...register("vendorUrl")} />
+          {/* ORGANIZER */}
+          <FormLabel htmlFor="organizerEmail">Organizer email</FormLabel>
+          <Input {...register("organizerEmail")} />
+          {/* SUBMIT */}
+          <Input type="submit" title="Next" value="Next" />
         </div>
       </form>
+      <ArtistModal isOpen={artistModalOpen} onModalClose={() => setArtistModalOpen(false)} onCreateArtist={onSelectArtist} />
     </div>
   );
 };
@@ -168,12 +198,12 @@ export const EventDescriptionForm: React.FC<EventDescriptionFormProps> = ({ even
     defaultValues: { eventDescription: event?.eventDescription ? event.eventDescription : undefined },
   });
 
-  if (event) return <>TODO</>;
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <h2>{eventName}</h2>
-      <textarea placeholder="Event descripton" {...register("eventDescription", { required: true })} />
-      <input type="submit" title="submit" value="Save event" />
+      <FormLabel htmlFor="eventDescription">Event descripton</FormLabel>
+      <Textarea placeholder="Event descripton" {...register("eventDescription", { required: true })} />
+      <Input type="submit" title="submit" value={event ? "Update event" : "Save event"} />
     </form>
   );
 };
@@ -191,6 +221,7 @@ export type EventInputs = {
   endDate: string;
   isFree: boolean;
   vendorUrl: string;
+  websiteUrl: string;
   organizerEmail: string;
   eventDescription: string;
   usersId: string;

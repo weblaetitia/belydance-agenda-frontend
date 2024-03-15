@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { useToast } from "@chakra-ui/react";
 import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +10,7 @@ const CreateEvent = () => {
   const [eventData, setEventData] = useState<EventInputs | null>();
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const onNext: SubmitHandler<EventInputs> = (data) => {
     setEventData(data);
@@ -26,6 +28,11 @@ const CreateEvent = () => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ ...eventData, eventDescription: data.eventDescription }),
+    });
+    toast({
+      description: "Sussesfilly updated",
+      isClosable: true,
+      status: "success",
     });
     navigate("/");
   };
