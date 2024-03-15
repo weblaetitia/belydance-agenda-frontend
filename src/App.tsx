@@ -2,8 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import "./App.css";
 import AppRouter from "./Router";
-
-const serveurUrl = import.meta.env.VITE_API_SERVER_URL;
+import { serverUrl } from "./utils/server";
 
 const App = () => {
   const [token, setToken] = useState<string | null>();
@@ -32,7 +31,7 @@ const App = () => {
 
   const handleInit = async () => {
     try {
-      await fetch(serveurUrl + "/users/init", {
+      await fetch(serverUrl + "/users/init", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -42,15 +41,13 @@ const App = () => {
     }
   };
 
-  console.log(user);
-
   if (isLoading) {
     return <p>loading...</p>;
   }
 
   if (error) {
     handleLogout();
-    console.log("Authentication error");
+    console.error("Authentication error");
     return <p>Error!</p>;
   }
 

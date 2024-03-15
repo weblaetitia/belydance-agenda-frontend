@@ -1,5 +1,6 @@
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import CreateEvent from "./pages/CreateEvent";
+import EventDetail from "./pages/EventDetail";
 import EventList from "./pages/EventList";
 import Layout from "./pages/Layout";
 
@@ -8,9 +9,12 @@ const router = createBrowserRouter(
     <>
       {/* Pages with layout */}
       <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to={"event-list"} />} />
-        <Route path="/event-list" element={<EventList />} />
-        <Route path="/create-event" element={<CreateEvent />} />
+        <Route index element={<Navigate to={"events/list"} />} />
+        <Route path={`events`}>
+          <Route path="list" element={<EventList />} />
+          <Route path="create" element={<CreateEvent />} />
+          <Route path={":eventID"} element={<EventDetail />} />
+        </Route>
         <Route path="*" element={<>*</>} />
       </Route>
     </>

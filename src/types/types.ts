@@ -1,23 +1,32 @@
 export type Event = {
+  id: string;
   version: number;
-  eventName: string;
+  name: string;
   facebookUrl: string;
-  eventType: [string];
-  style: [string];
-  artist: {
-    artistName: string;
-    artistFacebookUrl: string;
-    artistIgUrl: string;
-  };
+  danceTypes: string[];
+  eventTypes: string[];
+  artists: Artist[];
   location: string;
   startDate: string;
   endDate: string;
-  curency: string;
   isFree: boolean;
-  eventPrice: number;
-  eventCapacity: number;
   vendorUrl: string;
   organizerEmail: string;
   eventDescription: string;
   usersId: string;
+};
+
+export type Artist = {
+  id: string;
+  name: string;
+  urls: {
+    instagramUrl?: string;
+    facebookUrl?: string;
+    websiteUrl?: string;
+    youtubeUrl?: string;
+  };
+  location: {
+    city?: string;
+    country?: string;
+  };
 };

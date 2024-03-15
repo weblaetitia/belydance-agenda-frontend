@@ -2,7 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
-const serveurUrl = import.meta.env.VITE_API_SERVER_URL;
+const serverUrl = import.meta.env.VITE_API_SERVER_URL;
 
 const Layout = (): JSX.Element => {
   const [token, setToken] = useState<string | null>();
@@ -26,7 +26,7 @@ const Layout = (): JSX.Element => {
 
   const handleDeleteMe = async () => {
     try {
-      await fetch(serveurUrl + "/users", {
+      await fetch(serverUrl + "/users", {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -41,9 +41,12 @@ const Layout = (): JSX.Element => {
   return (
     <div>
       <div>
-        header - {user?.email} - <button onClick={handleDeleteMe}>Delete my account</button>
+        <button onClick={() => navigate("/")}>Home</button>
+        <button onClick={() => navigate("/events/create")}>Create event</button>
+        <button onClick={() => navigate("/events/list")}>Event list</button>
+        {user?.email}
+        <button onClick={handleDeleteMe}>Delete my account</button>
         <button onClick={handleLogout}>Logout</button>
-        <button onClick={() => navigate("/create-event")}>Create event</button>
       </div>
       <div>
         {" "}
