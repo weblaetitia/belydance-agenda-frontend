@@ -2,6 +2,7 @@ export type Event = {
   id: string;
   version: number;
   name: string;
+  imageUrl: string;
   facebookUrl: string;
   danceTypes: string[];
   eventTypes: string[];

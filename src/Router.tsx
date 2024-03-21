@@ -3,7 +3,6 @@ import CreateEvent from "./pages/CreateEvent";
 import EventDetail from "./pages/EventDetail";
 import EventList from "./pages/EventList";
 import Layout from "./pages/Layout";
-import UpdateEvent from "./pages/UpdateEvent";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,7 +15,7 @@ const router = createBrowserRouter(
           <Route path="create" element={<CreateEvent />} />
           <Route path={":eventID"} element={<EventDetail />} />
           <Route path="update">
-            <Route path=":eventID" element={<UpdateEvent />} />
+            <Route path=":eventID" element={<CreateEvent />} />
           </Route>
         </Route>
         <Route path="*" element={<>*</>} />

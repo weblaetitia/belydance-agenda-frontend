@@ -24,6 +24,7 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
   } = useForm<EventInputs>({
     defaultValues: {
       name: event ? event.name : undefined,
+      imageUrl: event ? event.imageUrl : undefined,
       facebookUrl: event?.facebookUrl ? event?.facebookUrl : undefined,
       eventTypes: event?.eventTypes ? event.eventTypes : undefined,
       danceTypes: event?.danceTypes ? event.danceTypes : undefined,
@@ -212,6 +213,7 @@ export type EventInputs = {
   id: string;
   version: number;
   name: string;
+  imageUrl: string;
   facebookUrl: string;
   danceTypes: string[];
   eventTypes: string[];

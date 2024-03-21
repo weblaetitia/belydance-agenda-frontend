@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Link } from "@chakra-ui/react";
+import { Image, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Event } from "../types/types";
@@ -36,7 +36,9 @@ const EventDetail = () => {
   return (
     <div>
       <h1>{event.name}</h1>
+      <Image boxSize="100%" objectFit="cover" src={serverUrl + "/" + event.imageUrl} alt={event.name} />
       <ul>
+        <li>Artists</li>
         <li>
           <ul>
             {event.artists.map((el, i) => (

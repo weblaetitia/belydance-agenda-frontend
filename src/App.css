@@ -4,6 +4,16 @@
   padding: 2rem;
 }
 
+.file-dropzone {
+  width: 100%;
+  padding: 30px;
+  border: 1px dashed grey;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
