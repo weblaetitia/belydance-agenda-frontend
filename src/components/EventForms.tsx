@@ -84,9 +84,6 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           <FormLabel htmlFor="name">Event name:</FormLabel>
           <Input placeholder="Event name" {...register("name", { required: true })} />
           {errors.name && <span>This field is required</span>}
-          {/* FACEBOOK */}
-          <FormLabel htmlFor="facebookUrl">Facebook event URL:</FormLabel>
-          <Input placeholder="Facebook event url" {...register("facebookUrl")} />
           {/* EVENT TYPE */}
           <FormLabel htmlFor="eventType">Event type:</FormLabel>
           <HStack>
@@ -170,6 +167,9 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           {/* FREE */}
           <FormLabel htmlFor="isFree">Is your event free?</FormLabel>
           <Checkbox {...register("isFree")}>Free</Checkbox>
+          {/* FACEBOOK */}
+          <FormLabel htmlFor="facebookUrl">Facebook event URL:</FormLabel>
+          <Input placeholder="Facebook event url" {...register("facebookUrl")} />
           {/* WEBSITE */}
           <FormLabel htmlFor="websiteUrl">Website for more informations</FormLabel>
           <Input {...register("websiteUrl")} />
@@ -189,22 +189,37 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
 };
 
 type EventDescriptionFormProps = {
+  update?: boolean;
   event?: Event;
   eventName: string;
   onSubmit: (data: DescriptionInputs) => void;
 };
 
-export const EventDescriptionForm: React.FC<EventDescriptionFormProps> = ({ event, eventName, onSubmit }) => {
+export const EventDescriptionForm: React.FC<EventDescriptionFormProps> = ({ update = false, event, eventName, onSubmit }) => {
   const { register, handleSubmit: handleSubmit } = useForm<DescriptionInputs>({
     defaultValues: { eventDescription: event?.eventDescription ? event.eventDescription : undefined },
   });
+
+  console.log(update);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <h2>{eventName}</h2>
       <FormLabel htmlFor="eventDescription">Event descripton</FormLabel>
       <Textarea placeholder="Event descripton" {...register("eventDescription", { required: true })} />
-      <Input type="submit" title="submit" value={event ? "Update event" : "Save event"} />
+      <Input type="submit" title="submit" value={update ? "Update event" : "Save event"} />
+    </form>
+  );
+};
+
+// TODO verify + clean url befor submit
+export const FacebookForm: React.FC<{ onSearch: (data: FacebookInput) => void }> = ({ onSearch }) => {
+  const { register, handleSubmit: handleSubmit } = useForm<FacebookInput>();
+  return (
+    <form onSubmit={handleSubmit(onSearch)}>
+      <FormLabel htmlFor="facebookUrl">Facebook event url:</FormLabel>
+      <Input placeholder="https://www.facebook.com/events/688042573307746/" {...register("facebookUrl")} />
+      <Input type="submit" title="submit" value={"Search for facebook event"} />
     </form>
   );
 };
@@ -231,4 +246,8 @@ export type EventInputs = {
 
 export type DescriptionInputs = {
   eventDescription: string;
+};
+
+export type FacebookInput = {
+  facebookUrl: string;
 };

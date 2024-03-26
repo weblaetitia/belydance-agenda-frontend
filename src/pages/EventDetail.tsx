@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Image, Link } from "@chakra-ui/react";
+import { Button, Image, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Event } from "../types/types";
@@ -18,7 +18,7 @@ const EventDetail = () => {
   const getEventDetail = async (id: string): Promise<void> => {
     const token = await getAccessTokenSilently();
     try {
-      const rawResponse = await fetch(serverUrl + "/events/" + id, {
+      const rawResponse = await fetch(serverUrl + "/events/one/" + id, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -26,7 +26,29 @@ const EventDetail = () => {
       const response = await rawResponse.json();
       setEvent(response.body);
     } catch (error) {
-      console.error("une erreur");
+      // TODO Error handler
+      console.error(error);
+    }
+  };
+
+  const deleteEvent = async (id: string): Promise<void> => {
+    const token = await getAccessTokenSilently();
+    try {
+      const rawResponse = await fetch(serverUrl + "/events/" + id, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const response = await rawResponse.json();
+      if (response.message) {
+        console.log(response.message); // TODO toast
+        navigate("/events/list");
+      } else {
+        console.log(response.error); // TODO toast
+      }
+    } catch (error) {
+      // TODO Error handler
       console.error(error);
     }
   };
@@ -68,6 +90,7 @@ const EventDetail = () => {
         <li>{event.vendorUrl}</li>
       </ul>
       <Link onClick={() => navigate("/events/update/" + eventID)}>Update Event</Link>
+      <Button onClick={() => deleteEvent(eventID)}>Delete Event</Button>
     </div>
   );
 };

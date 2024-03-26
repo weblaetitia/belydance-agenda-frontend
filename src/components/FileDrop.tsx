@@ -94,7 +94,7 @@ const DropContent: React.FC<{
           or <label htmlFor="image_input">click here</label> to import a file <br />
           <input id="image_input" type="file" onInput={(e) => handleImageSelect(e)} accept={ACCEPT_IMAGE} />
         </p>
-        {fileStatus === "error" ?? <p className="text-danger">Only support .png, .jpeg or .jpg file. Please check your file type.</p>}
+        {fileStatus === "error" && <p className="text-danger">Only support .png, .jpeg or .jpg file. Please check your file type.</p>}
       </>
     );
 };
