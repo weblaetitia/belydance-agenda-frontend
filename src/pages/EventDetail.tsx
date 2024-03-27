@@ -60,6 +60,7 @@ const EventDetail = () => {
       <h1>{event.name}</h1>
       <Image boxSize="100%" objectFit="cover" src={serverUrl + "/" + event.imageUrl} alt={event.name} />
       <ul>
+        <li>{event.formatedDate}</li>
         <li>Artists</li>
         <li>
           <ul>
@@ -80,9 +81,6 @@ const EventDetail = () => {
         </li>
         {event.isFree ? <li>Free event</li> : null}
 
-        <li>
-          {event.startDate} – {event.endDate}
-        </li>
         <li>{event.eventDescription}</li>
         <li>{event.facebookUrl}</li>
         <li>{event.location}</li>

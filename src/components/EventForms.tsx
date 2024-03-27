@@ -1,10 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Button, Checkbox, FormLabel, HStack, Input, Text, Textarea } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Button, Checkbox, FormLabel, HStack, Input, Select, Text, Textarea } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Artist, Event } from "../types/types";
 import { serverUrl } from "../utils/server";
 import ArtistModal from "./ArtistModal";
+import SearchPlace from "./SearchPlace";
 
 type EventFormDetailsProps = {
   event?: Event;
@@ -21,22 +22,32 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
     register,
     handleSubmit: handleNext,
     formState: { errors },
-  } = useForm<EventInputs>({
-    defaultValues: {
-      name: event ? event.name : undefined,
-      imageUrl: event ? event.imageUrl : undefined,
-      facebookUrl: event?.facebookUrl ? event?.facebookUrl : undefined,
-      eventTypes: event?.eventTypes ? event.eventTypes : undefined,
-      danceTypes: event?.danceTypes ? event.danceTypes : undefined,
-      artists: undefined, // TODO
-      location: event?.location ? event.location : undefined,
-      startDate: event?.startDate ? event.startDate : undefined,
-      endDate: event?.endDate ? event.endDate : undefined,
-      isFree: event?.isFree ? event.isFree : undefined,
-      vendorUrl: event?.vendorUrl ? event.vendorUrl : undefined,
-      organizerEmail: event?.organizerEmail ? event.organizerEmail : undefined,
-    },
-  });
+    setValue,
+  } = useForm<EventInputs>();
+
+  useEffect(() => {
+    if (event != null) {
+      setValue("name", event.name);
+      setValue("imageUrl", event.imageUrl);
+      setValue("facebookUrl", event.facebookUrl);
+      setValue("eventTypes", event.eventTypes);
+      setValue("danceTypes", event.danceTypes);
+      // TODO Artist
+      setValue("location", event.location);
+      if (event.startDate) {
+        setValue("startDate", formatDate(event.startDate));
+        setValue("startHour", formatHour(event.startDate));
+      }
+
+      if (event.endDate) {
+        setValue("endDate", formatDate(event.endDate));
+        setValue("endHour", formatHour(event.endDate));
+      }
+      setValue("isFree", event.isFree);
+      if (event.vendorUrl) setValue("vendorUrl", event.vendorUrl);
+      if (event.organizerEmail) setValue("organizerEmail", event.organizerEmail);
+    }
+  }, [event]);
 
   const searchArtist = async (artistInput: string) => {
     if (artistInput == null) return;
@@ -84,6 +95,8 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           <FormLabel htmlFor="name">Event name:</FormLabel>
           <Input placeholder="Event name" {...register("name", { required: true })} />
           {errors.name && <span>This field is required</span>}
+          {/* EVENT PLACE */}
+          <SearchPlace />
           {/* EVENT TYPE */}
           <FormLabel htmlFor="eventType">Event type:</FormLabel>
           <HStack>
@@ -161,9 +174,19 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           <FormLabel htmlFor="location">Event location:</FormLabel>
           <Input placeholder="location-id" {...register("location")} />
           {/* DATE */}
-          <FormLabel htmlFor="startDate">When does your event start and end? *</FormLabel>
+          <FormLabel>When does your event start and end? *</FormLabel>
           <Input type="date" id="startDate" {...register("startDate")} min="2023-03-01" />
-          <Input type="date" id="endtDate" {...register("endDate")} min="2023-03-01" />
+          <Select placeholder="Starting hour" id="startHour" {...register("startHour")}>
+            <option value="00:00">00:00</option>
+            <option value="00:15">00:15</option>
+            <option value="00:30">00:30</option>
+          </Select>
+          <Input type="date" id="endDate" {...register("endDate")} min="2023-03-01" />
+          <Select placeholder="Ending hour" id="endHour" {...register("endHour")}>
+            <option value="00:00">00:00</option>
+            <option value="00:15">00:15</option>
+            <option value="00:30">00:30</option>
+          </Select>
           {/* FREE */}
           <FormLabel htmlFor="isFree">Is your event free?</FormLabel>
           <Checkbox {...register("isFree")}>Free</Checkbox>
@@ -200,8 +223,6 @@ export const EventDescriptionForm: React.FC<EventDescriptionFormProps> = ({ upda
     defaultValues: { eventDescription: event?.eventDescription ? event.eventDescription : undefined },
   });
 
-  console.log(update);
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <h2>{eventName}</h2>
@@ -214,12 +235,24 @@ export const EventDescriptionForm: React.FC<EventDescriptionFormProps> = ({ upda
 
 // TODO verify + clean url befor submit
 export const FacebookForm: React.FC<{ onSearch: (data: FacebookInput) => void }> = ({ onSearch }) => {
-  const { register, handleSubmit: handleSubmit } = useForm<FacebookInput>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FacebookInput>();
+
+  // TODO: add validation for facebook url patern
+  // + clean url after /event/xxxxxx/
+
   return (
     <form onSubmit={handleSubmit(onSearch)}>
       <FormLabel htmlFor="facebookUrl">Facebook event url:</FormLabel>
       <Input placeholder="https://www.facebook.com/events/688042573307746/" {...register("facebookUrl")} />
-      <Input type="submit" title="submit" value={"Search for facebook event"} />
+      {errors.facebookUrl && errors.facebookUrl.type === "validate" && <>error</>}
+      {/* <Input type="submit" title="submit" value={"Search for facebook event"} /> */}
+      <Button type="submit" title="submit">
+        Search
+      </Button>
     </form>
   );
 };
@@ -235,7 +268,9 @@ export type EventInputs = {
   artists: string[];
   location: string;
   startDate: string;
+  startHour: string;
   endDate: string;
+  endHour: string;
   isFree: boolean;
   vendorUrl: string;
   websiteUrl: string;
@@ -250,4 +285,27 @@ export type DescriptionInputs = {
 
 export type FacebookInput = {
   facebookUrl: string;
+};
+
+const isValidUrl = (urlString: string): boolean => {
+  const urlPattern = new RegExp(
+    "^(https?:\\/\\/)?" + // validate protocol
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // validate domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // validate OR ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // validate port and path
+      "(\\?[;&a-z\\d%_.~+=-]*)?" + // validate query string
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  ); // validate fragment locator
+  return !!urlPattern.test(urlString);
+};
+
+const formatDate = (epoch: number): string => {
+  const date = new Date(epoch);
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`; //"YYYY-MM-DD"
+};
+
+const formatHour = (epoch: number): string => {
+  const date = new Date(epoch);
+  return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
 };

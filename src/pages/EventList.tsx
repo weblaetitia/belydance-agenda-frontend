@@ -1,11 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Event } from "../types/types";
+import { EventExtract } from "../types/types";
 import { serverUrl } from "../utils/server";
 
 const EventList = () => {
-  const [events, setEvents] = useState<Event[] | null>();
+  const [events, setEvents] = useState<EventExtract[] | null>();
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
 
@@ -27,6 +27,7 @@ const EventList = () => {
       console.error(error);
     }
   };
+
   return (
     <div>
       <h1>Events list</h1>
@@ -35,9 +36,7 @@ const EventList = () => {
           {events.map((event, i) => {
             return (
               <li key={i} onClick={() => navigate("/events/" + event.id)}>
-                <a>
-                  {event.name} – {event.startDate}
-                </a>
+                <a>{event.name}</a> - {new Date(event.startDate).toLocaleDateString()}
               </li>
             );
           })}

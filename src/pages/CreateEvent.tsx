@@ -16,7 +16,7 @@ import { Event, FacebookEvent } from "../types/types";
 import { serverUrl } from "../utils/server";
 
 const CreateEvent = () => {
-  const [eventData, setEventData] = useState<EventInputs | undefined>();
+  const [eventData, setEventData] = useState<Event | undefined>();
   const [formData, setFormData] = useState<FormData | undefined>(); // event cover image
   const [coverImage, setCoverImage] = useState<string | undefined>(); // cover image file
   const [previousEvent, setPreviousEvent] = useState<Event | undefined>();
@@ -30,6 +30,7 @@ const CreateEvent = () => {
   useEffect(() => {
     if (eventID != null) getEventDetail(eventID);
   }, [eventID]);
+
   useEffect(() => {
     if (facebookEvent != null) {
       const event = {
@@ -40,8 +41,8 @@ const CreateEvent = () => {
         eventTypes: [],
         artists: [],
         location: facebookEvent.location.city ? facebookEvent.location.city : "",
-        startDate: facebookEvent.formattedDate,
-        endDate: undefined,
+        startDate: facebookEvent.startTimestamp,
+        endDate: facebookEvent.endTimestamp,
         isFree: false,
         vendorUrl: facebookEvent.ticketUrl,
         eventDescription: facebookEvent.description,
@@ -53,7 +54,7 @@ const CreateEvent = () => {
   const getEventDetail = async (id: string): Promise<void> => {
     const token = await getAccessTokenSilently();
     try {
-      const rawResponse = await fetch(serverUrl + "/events/" + id, {
+      const rawResponse = await fetch(serverUrl + "/events/one/" + id, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -66,7 +67,8 @@ const CreateEvent = () => {
   };
 
   const onNext: SubmitHandler<EventInputs> = (data) => {
-    setEventData(data);
+    const formated = formatDate(data);
+    setEventData({ ...data, startDate: formated.startDateEpoch, endDate: formated.endDateEpoch, formatedDate: formated.formatedDate });
   };
 
   const onSubmit: SubmitHandler<DescriptionInputs> = async (data) => {
@@ -179,3 +181,39 @@ const CreateEvent = () => {
 };
 
 export default CreateEvent;
+
+const formatDate = (
+  data: EventInputs
+): {
+  startDateEpoch: number | undefined;
+  endDateEpoch: number | undefined;
+  formatedDate: string | undefined;
+} => {
+  let startDateString = undefined;
+  if (data.startDate != "") startDateString = data.startDate;
+  if (data.startHour != "") startDateString = startDateString + " " + data.startHour;
+  let startDateEpoch = undefined;
+  if (startDateString != undefined) {
+    const startDate = new Date(startDateString);
+    startDateEpoch = startDate.getTime();
+  }
+
+  let endDateString = undefined;
+  if (data.endDate != "") endDateString = data.endDate;
+  if (data.endHour != "") endDateString = endDateString + " " + data.endHour;
+  let endDateEpoch = undefined;
+  if (endDateString != undefined) {
+    const endDate = new Date(endDateString);
+    endDateEpoch = endDate.getTime();
+  }
+
+  let formatedDate = undefined;
+  if (startDateString != undefined) formatedDate = startDateString;
+  if (endDateString != undefined) formatedDate = formatedDate + " – " + endDateString;
+
+  return {
+    startDateEpoch,
+    endDateEpoch,
+    formatedDate,
+  };
+};

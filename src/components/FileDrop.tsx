@@ -24,8 +24,13 @@ export const FileDrop: React.FC<FileDropProps> = ({ getFormInfo, getCoverImage }
   // Drag n drop file
   const handleOnDrop = (e: React.DragEvent): void => {
     e.preventDefault();
+    if (e.dataTransfer.files[0].type != "image/png" && e.dataTransfer.files[0].type != "image/jpeg") {
+      setFileStatus("error");
+      return;
+    }
     const form = new FormData();
     form.append("file", e.dataTransfer.files[0], e.dataTransfer.files[0].name);
+    setFileStatus("success");
     getCoverImage(URL.createObjectURL(e.dataTransfer.files[0]));
     getFormInfo(form);
   };
@@ -55,7 +60,6 @@ export const FileDrop: React.FC<FileDropProps> = ({ getFormInfo, getCoverImage }
         onDrop={(e) => handleOnDrop(e)}
       >
         <FileIcons fileStatus={fileStatus} />
-
         <DropContent fileName={fileInfos.name} fileStatus={fileStatus} handleImageSelect={handleSelectFile} />
       </div>
     </>
@@ -79,7 +83,6 @@ const DropContent: React.FC<{
   handleImageSelect: (e: any) => void;
 }> = ({ fileName, fileStatus, handleImageSelect }) => {
   if (fileStatus === "on_process") return <Spinner />;
-
   if (fileStatus === "success") {
     return (
       <>
