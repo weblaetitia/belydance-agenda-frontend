@@ -83,7 +83,11 @@ const EventDetail = () => {
 
         <li>{event.eventDescription}</li>
         <li>{event.facebookUrl}</li>
-        <li>{event.location}</li>
+        {event.location && (
+          <li>
+            {event.location.name} ({event.location.address.postcode}) - {event.location.address.country}
+          </li>
+        )}
         <li>{event.organizerEmail}</li>
         <li>{event.vendorUrl}</li>
       </ul>

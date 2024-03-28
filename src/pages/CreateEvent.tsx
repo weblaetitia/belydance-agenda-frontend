@@ -12,7 +12,7 @@ import {
   FacebookInput,
 } from "../components/EventForms";
 import { FileDrop } from "../components/FileDrop";
-import { Event, FacebookEvent } from "../types/types";
+import { Artist, Event, FacebookEvent } from "../types/types";
 import { serverUrl } from "../utils/server";
 
 const CreateEvent = () => {
@@ -40,7 +40,8 @@ const CreateEvent = () => {
         danceTypes: [],
         eventTypes: [],
         artists: [],
-        location: facebookEvent.location.city ? facebookEvent.location.city : "",
+        // TODO: fetch OSM with facebook eventcity then reurn osm place in location
+        // location: facebookEvent.location.city ? facebookEvent.location.city : "",
         startDate: facebookEvent.startTimestamp,
         endDate: facebookEvent.endTimestamp,
         isFree: false,
@@ -68,10 +69,19 @@ const CreateEvent = () => {
 
   const onNext: SubmitHandler<EventInputs> = (data) => {
     const formated = formatDate(data);
-    setEventData({ ...data, startDate: formated.startDateEpoch, endDate: formated.endDateEpoch, formatedDate: formated.formatedDate });
+    console.log(data.artists);
+    const artists = data.artists as unknown as Artist[];
+    setEventData({
+      ...data,
+      artists: artists,
+      startDate: formated.startDateEpoch,
+      endDate: formated.endDateEpoch,
+      formatedDate: formated.formatedDate,
+    });
   };
 
   const onSubmit: SubmitHandler<DescriptionInputs> = async (data) => {
+    console.log(data);
     const token = await getAccessTokenSilently();
     // 1 Send image to server
     let imageUrl = null;
@@ -98,6 +108,7 @@ const CreateEvent = () => {
       eventDescription: data.eventDescription,
       ...(formData && imageUrl && { imageUrl: serverUrl + "/" + imageUrl }),
     };
+    console.log(newEvent);
     const rawResponse = await fetch(eventID ? serverUrl + "/events/" + eventID : serverUrl + "/events/new", {
       method: eventID ? "PUT" : "POST", // update : create
       mode: "cors",
@@ -110,6 +121,7 @@ const CreateEvent = () => {
       body: JSON.stringify(newEvent),
     });
     const response = await rawResponse.json();
+    console.log(response);
 
     if (response.body) {
       toast({

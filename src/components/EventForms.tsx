@@ -2,7 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Button, Checkbox, FormLabel, HStack, Input, Select, Text, Textarea } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Artist, Event } from "../types/types";
+import { Artist, Event, OsmPlace } from "../types/types";
 import { serverUrl } from "../utils/server";
 import ArtistModal from "./ArtistModal";
 import SearchPlace from "./SearchPlace";
@@ -16,6 +16,8 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
   const [artistSelected, setArtistSelected] = useState<Artist[] | undefined>(event ? event.artists : undefined);
   const [artistsFound, setArtistsFound] = useState<Artist[] | null>();
   const [artistModalOpen, setArtistModalOpen] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<OsmPlace | undefined>();
+
   const { getAccessTokenSilently } = useAuth0();
 
   const {
@@ -70,7 +72,7 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
       onNext(data);
     } else {
       const artistIds = artistSelected?.map((artist) => artist.id);
-      onNext({ ...data, artists: artistIds });
+      onNext({ ...data, artists: artistIds, location: selectedPlace });
     }
   };
 
@@ -96,7 +98,7 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           <Input placeholder="Event name" {...register("name", { required: true })} />
           {errors.name && <span>This field is required</span>}
           {/* EVENT PLACE */}
-          <SearchPlace />
+          <SearchPlace onSelectPlace={setSelectedPlace} initialPlace={event != null ? event.location : undefined} />
           {/* EVENT TYPE */}
           <FormLabel htmlFor="eventType">Event type:</FormLabel>
           <HStack>
@@ -170,9 +172,6 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           <Text>
             Can't find your artist? <Button onClick={() => setArtistModalOpen(true)}>Create new</Button>
           </Text>
-          {/* LOCATION */}
-          <FormLabel htmlFor="location">Event location:</FormLabel>
-          <Input placeholder="location-id" {...register("location")} />
           {/* DATE */}
           <FormLabel>When does your event start and end? *</FormLabel>
           <Input type="date" id="startDate" {...register("startDate")} min="2023-03-01" />
@@ -233,7 +232,6 @@ export const EventDescriptionForm: React.FC<EventDescriptionFormProps> = ({ upda
   );
 };
 
-// TODO verify + clean url befor submit
 export const FacebookForm: React.FC<{ onSearch: (data: FacebookInput) => void }> = ({ onSearch }) => {
   const {
     register,
@@ -242,6 +240,7 @@ export const FacebookForm: React.FC<{ onSearch: (data: FacebookInput) => void }>
   } = useForm<FacebookInput>();
 
   // TODO: add validation for facebook url patern
+  // See /utilis.ts function isValidUrl
   // + clean url after /event/xxxxxx/
 
   return (
@@ -249,7 +248,6 @@ export const FacebookForm: React.FC<{ onSearch: (data: FacebookInput) => void }>
       <FormLabel htmlFor="facebookUrl">Facebook event url:</FormLabel>
       <Input placeholder="https://www.facebook.com/events/688042573307746/" {...register("facebookUrl")} />
       {errors.facebookUrl && errors.facebookUrl.type === "validate" && <>error</>}
-      {/* <Input type="submit" title="submit" value={"Search for facebook event"} /> */}
       <Button type="submit" title="submit">
         Search
       </Button>
@@ -266,7 +264,7 @@ export type EventInputs = {
   danceTypes: string[];
   eventTypes: string[];
   artists: string[];
-  location: string;
+  location?: OsmPlace;
   startDate: string;
   startHour: string;
   endDate: string;
@@ -285,19 +283,6 @@ export type DescriptionInputs = {
 
 export type FacebookInput = {
   facebookUrl: string;
-};
-
-const isValidUrl = (urlString: string): boolean => {
-  const urlPattern = new RegExp(
-    "^(https?:\\/\\/)?" + // validate protocol
-      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // validate domain name
-      "((\\d{1,3}\\.){3}\\d{1,3}))" + // validate OR ip (v4) address
-      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // validate port and path
-      "(\\?[;&a-z\\d%_.~+=-]*)?" + // validate query string
-      "(\\#[-a-z\\d_]*)?$",
-    "i"
-  ); // validate fragment locator
-  return !!urlPattern.test(urlString);
 };
 
 const formatDate = (epoch: number): string => {
