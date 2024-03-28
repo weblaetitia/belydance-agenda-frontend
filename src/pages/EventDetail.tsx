@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Event } from "../types/types";
 import { serverUrl } from "../utils/server";
 
-const EventDetail = () => {
+const EventDetail: React.FC = () => {
   const [event, setEvent] = useState<Event | null>();
   const { eventID } = useParams();
   const { getAccessTokenSilently } = useAuth0();

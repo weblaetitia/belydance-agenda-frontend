@@ -51,7 +51,7 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
     }
   }, [event]);
 
-  const searchArtist = async (artistInput: string) => {
+  const searchArtist = async (artistInput: string): Promise<void> => {
     if (artistInput == null) return;
     try {
       const token = await getAccessTokenSilently();
@@ -85,8 +85,8 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
     setArtistsFound(null);
   };
 
-  const onRemoveArtist = (artistToRemove: Artist) => {
-    setArtistSelected(artistSelected?.filter((artist) => artist.id != artistToRemove.id));
+  const onRemoveArtist = (artistToRemove: Artist): void => {
+    setArtistSelected(artistSelected?.filter((artist) => artist.id !== artistToRemove.id));
   };
 
   return (

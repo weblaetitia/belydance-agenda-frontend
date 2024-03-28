@@ -24,7 +24,7 @@ export const FileDrop: React.FC<FileDropProps> = ({ getFormInfo, getCoverImage }
   // Drag n drop file
   const handleOnDrop = (e: React.DragEvent): void => {
     e.preventDefault();
-    if (e.dataTransfer.files[0].type != "image/png" && e.dataTransfer.files[0].type != "image/jpeg") {
+    if (e.dataTransfer.files[0].type !== "image/png" && e.dataTransfer.files[0].type !== "image/jpeg") {
       setFileStatus("error");
       return;
     }
@@ -42,7 +42,8 @@ export const FileDrop: React.FC<FileDropProps> = ({ getFormInfo, getCoverImage }
   };
 
   // Select image
-  const handleSelectFile = (e: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSelectFile = (e: any): void => {
     e.preventDefault();
     const form = new FormData();
     form.append("file", e.target.files[0], e.target.files[0].name);
@@ -80,6 +81,7 @@ const FileIcons: React.FC<{
 const DropContent: React.FC<{
   fileName: string;
   fileStatus: FileStatus;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleImageSelect: (e: any) => void;
 }> = ({ fileName, fileStatus, handleImageSelect }) => {
   if (fileStatus === "on_process") return <Spinner />;

@@ -17,7 +17,7 @@ const SearchPlace: React.FC<SearchPlaceProps> = ({ initialPlace, onSelectPlace }
     if (selectedPlace != null) onSelectPlace(selectedPlace);
   }, [selectedPlace]);
 
-  const search = async (value: string) => {
+  const search = async (value: string): Promise<void> => {
     setSelectedPlace(undefined);
     const params = { q: value, format: "json", addressdetails: "1", polygon_geojson: "0" };
     const options = { method: "GET", redirect: "follow" } as RequestInit;
@@ -30,7 +30,7 @@ const SearchPlace: React.FC<SearchPlaceProps> = ({ initialPlace, onSelectPlace }
     }
   };
 
-  const onClickPlace = (place: OsmPlace) => {
+  const onClickPlace = (place: OsmPlace): void => {
     setSelectedPlace(place);
     setListPlace(undefined);
   };

@@ -57,7 +57,7 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ isOpen = false, onModalClose,
         });
       } else if (response.body) {
         toast({
-          title: '"Artist created',
+          title: "Artist created",
           status: "success",
           isClosable: true,
         });

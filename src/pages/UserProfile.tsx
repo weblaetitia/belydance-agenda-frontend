@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../utils/server";
 
-const UserProfile = () => {
+const UserProfile: React.FC = () => {
   const { logout, getAccessTokenSilently, user } = useAuth0();
   const toast = useToast();
   const navigate = useNavigate();

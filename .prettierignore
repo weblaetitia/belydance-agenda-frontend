@@ -1,0 +1,6 @@
+# Ignore artifacts:
+build
+coverage
+
+# don't ever pretttier node_modules
+node_modules

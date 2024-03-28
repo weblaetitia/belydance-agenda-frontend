@@ -15,7 +15,7 @@ import { FileDrop } from "../components/FileDrop";
 import { Artist, Event, FacebookEvent } from "../types/types";
 import { serverUrl } from "../utils/server";
 
-const CreateEvent = () => {
+const CreateEvent: React.FC = () => {
   const [eventData, setEventData] = useState<Event | undefined>();
   const [formData, setFormData] = useState<FormData | undefined>(); // event cover image
   const [coverImage, setCoverImage] = useState<string | undefined>(); // cover image file
@@ -139,7 +139,7 @@ const CreateEvent = () => {
     }
   };
 
-  const getFormInfo = (form: FormData) => {
+  const getFormInfo = (form: FormData): void => {
     setFormData(form);
   };
 
@@ -202,26 +202,26 @@ const formatDate = (
   formatedDate: string | undefined;
 } => {
   let startDateString = undefined;
-  if (data.startDate != "") startDateString = data.startDate;
-  if (data.startHour != "") startDateString = startDateString + " " + data.startHour;
+  if (data.startDate !== "") startDateString = data.startDate;
+  if (data.startHour !== "") startDateString = startDateString + " " + data.startHour;
   let startDateEpoch = undefined;
-  if (startDateString != undefined) {
+  if (startDateString !== undefined) {
     const startDate = new Date(startDateString);
     startDateEpoch = startDate.getTime();
   }
 
   let endDateString = undefined;
-  if (data.endDate != "") endDateString = data.endDate;
-  if (data.endHour != "") endDateString = endDateString + " " + data.endHour;
+  if (data.endDate !== "") endDateString = data.endDate;
+  if (data.endHour !== "") endDateString = endDateString + " " + data.endHour;
   let endDateEpoch = undefined;
-  if (endDateString != undefined) {
+  if (endDateString !== undefined) {
     const endDate = new Date(endDateString);
     endDateEpoch = endDate.getTime();
   }
 
   let formatedDate = undefined;
-  if (startDateString != undefined) formatedDate = startDateString;
-  if (endDateString != undefined) formatedDate = formatedDate + " – " + endDateString;
+  if (startDateString !== undefined) formatedDate = startDateString;
+  if (endDateString !== undefined) formatedDate = formatedDate + " – " + endDateString;
 
   return {
     startDateEpoch,

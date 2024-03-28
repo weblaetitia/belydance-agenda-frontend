@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { EventExtract } from "../types/types";
 import { serverUrl } from "../utils/server";
 
-const EventList = () => {
+const EventList: React.FC = () => {
   const [events, setEvents] = useState<EventExtract[] | null>();
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const EventList = () => {
     getEventList();
   }, []);
 
-  const getEventList = async () => {
+  const getEventList = async (): Promise<void> => {
     const token = await getAccessTokenSilently();
     try {
       const rawResponse = await fetch(serverUrl + "/events/all", {
