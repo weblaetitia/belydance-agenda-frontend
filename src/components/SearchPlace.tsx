@@ -1,8 +1,7 @@
 import { FormLabel, Input } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { searchOsmPlace } from "../actions/actions";
 import { OsmPlace } from "../types/types";
-
-const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 
 type SearchPlaceProps = {
   initialPlace?: OsmPlace;
@@ -12,18 +11,33 @@ type SearchPlaceProps = {
 const SearchPlace: React.FC<SearchPlaceProps> = ({ initialPlace, onSelectPlace }) => {
   const [selectedPlace, setSelectedPlace] = useState<OsmPlace | undefined>(initialPlace);
   const [listPlace, setListPlace] = useState<OsmPlace[] | undefined>();
+  const [inputValue, setInputValue] = useState("");
+  const [debouncedInputValue, setDebouncedInputValue] = useState("");
 
   useEffect(() => {
     if (selectedPlace != null) onSelectPlace(selectedPlace);
   }, [selectedPlace]);
+  useEffect(() => {
+    if (debouncedInputValue != null) {
+      fetchOsmPlace(debouncedInputValue);
+    }
+  }, [debouncedInputValue]);
+
+  useEffect(() => {
+    const delayInputTimeoutId = setTimeout(async () => {
+      setDebouncedInputValue(inputValue);
+    }, 500);
+    return () => clearTimeout(delayInputTimeoutId);
+  }, [inputValue, 500]);
 
   const search = async (value: string): Promise<void> => {
     setSelectedPlace(undefined);
-    const params = { q: value, format: "json", addressdetails: "1", polygon_geojson: "0" };
-    const options = { method: "GET", redirect: "follow" } as RequestInit;
+    setInputValue(value);
+  };
+
+  const fetchOsmPlace = async (value: string) => {
     try {
-      const raw = await fetch(`${NOMINATIM_BASE_URL}` + new URLSearchParams(params).toString(), options);
-      const response = await raw.json();
+      const response = await searchOsmPlace(value);
       setListPlace(response);
     } catch (error) {
       console.log(error);

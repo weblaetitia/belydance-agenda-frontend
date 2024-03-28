@@ -13,7 +13,7 @@ type EventFormDetailsProps = {
 };
 
 export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNext }) => {
-  const [artistSelected, setArtistSelected] = useState<Artist[] | undefined>(event ? event.artists : undefined);
+  const [artistSelected, setArtistSelected] = useState<Artist[] | undefined>(event?.artists ? event.artists : undefined);
   const [artistsFound, setArtistsFound] = useState<Artist[] | null>();
   const [artistModalOpen, setArtistModalOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<OsmPlace | undefined>();
@@ -34,7 +34,7 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
       setValue("facebookUrl", event.facebookUrl);
       setValue("eventTypes", event.eventTypes);
       setValue("danceTypes", event.danceTypes);
-      // TODO Artist
+      if (event.artists) setValue("artists", event.artists);
       setValue("location", event.location);
       if (event.startDate) {
         setValue("startDate", formatDate(event.startDate));
@@ -68,11 +68,12 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
   };
 
   const onSubmit: SubmitHandler<EventInputs> = (data) => {
+    console.log("artist sent to parent", artistSelected);
     if (artistSelected == null) {
       onNext(data);
     } else {
       const artistIds = artistSelected?.map((artist) => artist.id);
-      onNext({ ...data, artists: artistIds, location: selectedPlace });
+      onNext({ ...data, artists: artistSelected, location: selectedPlace });
     }
   };
 
@@ -263,7 +264,7 @@ export type EventInputs = {
   facebookUrl: string;
   danceTypes: string[];
   eventTypes: string[];
-  artists: string[];
+  artists: Artist[];
   location?: OsmPlace;
   startDate: string;
   startHour: string;

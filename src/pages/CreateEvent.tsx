@@ -3,6 +3,7 @@ import { Button, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+import { searchOsmPlace } from "../actions/actions";
 import {
   DescriptionInputs,
   EventDescriptionForm,
@@ -32,24 +33,31 @@ const CreateEvent: React.FC = () => {
   }, [eventID]);
 
   useEffect(() => {
-    if (facebookEvent != null) {
-      const event = {
-        name: facebookEvent.name,
-        imageUrl: facebookEvent.photo.imageUri,
-        facebookUrl: facebookEvent.url,
-        danceTypes: [],
-        eventTypes: [],
-        artists: [],
-        // TODO: fetch OSM with facebook eventcity then reurn osm place in location
-        // location: facebookEvent.location.city ? facebookEvent.location.city : "",
-        startDate: facebookEvent.startTimestamp,
-        endDate: facebookEvent.endTimestamp,
-        isFree: false,
-        vendorUrl: facebookEvent.ticketUrl,
-        eventDescription: facebookEvent.description,
-      };
-      setPreviousEvent(event);
-    }
+    const handleFacebookEvent = async (): Promise<void> => {
+      if (facebookEvent != null) {
+        // Fetch OSM
+        let places = undefined;
+        if (facebookEvent.location?.city) places = await searchOsmPlace(facebookEvent.location.city);
+        console.log(places);
+        // set event
+        const event = {
+          name: facebookEvent.name,
+          imageUrl: facebookEvent.photo.imageUri,
+          facebookUrl: facebookEvent.url,
+          danceTypes: [],
+          eventTypes: [],
+          artists: [],
+          ...(places && { location: places[0] }),
+          startDate: facebookEvent.startTimestamp,
+          endDate: facebookEvent.endTimestamp,
+          isFree: false,
+          vendorUrl: facebookEvent.ticketUrl,
+          eventDescription: facebookEvent.description,
+        };
+        setPreviousEvent(event);
+      }
+    };
+    handleFacebookEvent();
   }, [facebookEvent]);
 
   const getEventDetail = async (id: string): Promise<void> => {
@@ -164,6 +172,7 @@ const CreateEvent: React.FC = () => {
       console.error(error);
     }
   };
+
   return (
     <div>
       {previousEvent && <Button onClick={() => navigate(-1)}>Back to previous page</Button>}
