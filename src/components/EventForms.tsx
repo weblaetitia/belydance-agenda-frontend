@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Button, Checkbox, FormLabel, HStack, Input, Select, Text, Textarea } from "@chakra-ui/react";
+import { Button, Checkbox, FormLabel, HStack, Input, Select, Tag, TagCloseButton, TagLabel, Text, Textarea } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Artist, Event, OsmPlace } from "../types/types";
@@ -68,11 +68,9 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
   };
 
   const onSubmit: SubmitHandler<EventInputs> = (data) => {
-    console.log("artist sent to parent", artistSelected);
     if (artistSelected == null) {
       onNext(data);
     } else {
-      const artistIds = artistSelected?.map((artist) => artist.id);
       onNext({ ...data, artists: artistSelected, location: selectedPlace });
     }
   };
@@ -151,11 +149,12 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           {/* ARTISTS */}
           <FormLabel htmlFor="search Artist">Artist:</FormLabel>
           {artistSelected && (
-            <HStack>
+            <HStack spacing={4}>
               {artistSelected.map((artist, i) => (
-                <Button key={i}>
-                  {artist.name} <span onClick={() => onRemoveArtist(artist)}>X</span>
-                </Button>
+                <Tag size="lg" key={i} borderRadius="full" variant="solid" colorScheme="blue">
+                  <TagLabel>{artist.name}</TagLabel>
+                  <TagCloseButton onClick={() => onRemoveArtist(artist)} />
+                </Tag>
               ))}
             </HStack>
           )}

@@ -2,6 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Button, Image, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import LocationMap from "../components/LocationMap";
 import { Event } from "../types/types";
 import { serverUrl } from "../utils/server";
 
@@ -85,7 +86,10 @@ const EventDetail: React.FC = () => {
         <li>{event.facebookUrl}</li>
         {event.location && (
           <li>
-            {event.location.name} ({event.location.address.postcode}) - {event.location.address.country}
+            <p>
+              {event.location.name} ({event.location.address.postcode}) - {event.location.address.country}
+            </p>
+            <LocationMap position={{ lat: Number(event.location.lat), lng: Number(event.location.lon) }} zoom={6} />
           </li>
         )}
         <li>{event.organizerEmail}</li>

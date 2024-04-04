@@ -38,7 +38,6 @@ const CreateEvent: React.FC = () => {
         // Fetch OSM
         let places = undefined;
         if (facebookEvent.location?.city) places = await searchOsmPlace(facebookEvent.location.city);
-        console.log(places);
         // set event
         const event = {
           name: facebookEvent.name,
@@ -77,7 +76,6 @@ const CreateEvent: React.FC = () => {
 
   const onNext: SubmitHandler<EventInputs> = (data) => {
     const formated = formatDate(data);
-    console.log(data.artists);
     const artists = data.artists as unknown as Artist[];
     setEventData({
       ...data,
@@ -89,7 +87,6 @@ const CreateEvent: React.FC = () => {
   };
 
   const onSubmit: SubmitHandler<DescriptionInputs> = async (data) => {
-    console.log(data);
     const token = await getAccessTokenSilently();
     // 1 Send image to server
     let imageUrl = null;
@@ -116,7 +113,6 @@ const CreateEvent: React.FC = () => {
       eventDescription: data.eventDescription,
       ...(formData && imageUrl && { imageUrl: serverUrl + "/" + imageUrl }),
     };
-    console.log(newEvent);
     const rawResponse = await fetch(eventID ? serverUrl + "/events/" + eventID : serverUrl + "/events/new", {
       method: eventID ? "PUT" : "POST", // update : create
       mode: "cors",
@@ -129,7 +125,6 @@ const CreateEvent: React.FC = () => {
       body: JSON.stringify(newEvent),
     });
     const response = await rawResponse.json();
-    console.log(response);
 
     if (response.body) {
       toast({

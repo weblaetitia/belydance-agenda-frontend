@@ -13,7 +13,6 @@ const UserProfile: React.FC = () => {
   });
 
   const onSubmit = async (data: User): Promise<void> => {
-    console.log(data);
     const token = await getAccessTokenSilently();
     const rawResponse = await fetch(serverUrl + "/users", {
       method: "PATCH",

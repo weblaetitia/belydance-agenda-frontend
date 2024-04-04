@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { Button, HStack } from "@chakra-ui/react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 const Layout = (): JSX.Element => {
@@ -11,14 +12,13 @@ const Layout = (): JSX.Element => {
 
   return (
     <div>
-      <div>
-        <button onClick={() => navigate("/")}>Home</button>
-        <button onClick={() => navigate("/events/create")}>Create event</button>
-        <button onClick={() => navigate("/events/list")}>Event list</button>
-        {user?.nickname}
-        <button onClick={() => navigate("/user")}>My profile</button>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+      <HStack>
+        <Button onClick={() => navigate("/")}>Home</Button>
+        <Button onClick={() => navigate("/events/create")}>Create event</Button>
+        <Button onClick={() => navigate("/events/list")}>Event list</Button>
+        <Button onClick={() => navigate("/user")}>My profile</Button>
+        <Button onClick={handleLogout}>Logout</Button>
+      </HStack>
       <div>
         {" "}
         <Outlet />
