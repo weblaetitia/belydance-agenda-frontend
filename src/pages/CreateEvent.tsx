@@ -4,14 +4,7 @@ import { useEffect, useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { searchOsmPlace } from "../actions/actions";
-import {
-  DescriptionInputs,
-  EventDescriptionForm,
-  EventFormDetails,
-  EventInputs,
-  FacebookForm,
-  FacebookInput,
-} from "../components/EventForms";
+import { EventDescriptionForm, EventFormDetails, EventInputs, FacebookForm, FacebookInput } from "../components/EventForms";
 import { FileDrop } from "../components/FileDrop";
 import { Artist, Event, FacebookEvent } from "../types/types";
 import { serverUrl } from "../utils/server";
@@ -86,7 +79,7 @@ const CreateEvent: React.FC = () => {
     });
   };
 
-  const onSubmit: SubmitHandler<DescriptionInputs> = async (data) => {
+  const onSubmit = async (eventDescription: string) => {
     const token = await getAccessTokenSilently();
     // 1 Send image to server
     let imageUrl = null;
@@ -110,7 +103,7 @@ const CreateEvent: React.FC = () => {
     // 2 Create or update event
     const newEvent = {
       ...eventData,
-      eventDescription: data.eventDescription,
+      eventDescription: eventDescription,
       ...(formData && imageUrl && { imageUrl: serverUrl + "/" + imageUrl }),
     };
     const rawResponse = await fetch(eventID ? serverUrl + "/events/" + eventID : serverUrl + "/events/new", {
@@ -183,7 +176,7 @@ const CreateEvent: React.FC = () => {
         {previousEvent && eventData != null && (
           <EventDescriptionForm
             eventName={eventData.name}
-            onSubmit={(data) => onSubmit(data)}
+            onSubmit={(descriptionText) => onSubmit(descriptionText)}
             event={previousEvent}
             update={eventID != null}
           />

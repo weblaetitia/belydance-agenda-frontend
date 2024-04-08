@@ -2,12 +2,14 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Button, Image, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { serialize } from "../components/DescriptionEditor/plugins/Serialize/serialize";
 import LocationMap from "../components/LocationMap";
 import { Event } from "../types/types";
 import { serverUrl } from "../utils/server";
 
 const EventDetail: React.FC = () => {
   const [event, setEvent] = useState<Event | null>();
+  const [htmlDescription, setHtmlDescription] = useState<string[] | null>();
   const { eventID } = useParams();
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
@@ -15,6 +17,18 @@ const EventDetail: React.FC = () => {
   useEffect(() => {
     if (eventID != null) getEventDetail(eventID);
   }, [eventID]);
+
+  useEffect(() => {
+    if (event?.eventDescription != null) {
+      try {
+        const json = JSON.parse(event.eventDescription);
+        const serialized = serialize(json.root.children);
+        setHtmlDescription(serialized);
+      } catch {
+        // do nothing
+      }
+    }
+  }, [event]);
 
   const getEventDetail = async (id: string): Promise<void> => {
     const token = await getAccessTokenSilently();
@@ -82,7 +96,10 @@ const EventDetail: React.FC = () => {
         </li>
         {event.isFree ? <li>Free event</li> : null}
 
-        <li>{event.eventDescription}</li>
+        {/* <li>{event.eventDescription}</li> */}
+        {htmlDescription &&
+          htmlDescription.map((el, i) => <div className="description-content" key={i} dangerouslySetInnerHTML={{ __html: el }}></div>)}
+        {htmlDescription == null && event.eventDescription && <li>{event.eventDescription}</li>}
         <li>{event.facebookUrl}</li>
         {event.location && (
           <li>

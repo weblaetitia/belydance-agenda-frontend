@@ -1,10 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Button, Checkbox, FormLabel, HStack, Input, Select, Tag, TagCloseButton, TagLabel, Text, Textarea } from "@chakra-ui/react";
+import { Button, Checkbox, FormLabel, HStack, Input, Select, Tag, TagCloseButton, TagLabel, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Artist, Event, OsmPlace } from "../types/types";
 import { serverUrl } from "../utils/server";
 import ArtistModal from "./ArtistModal";
+import DescriptionEditor from "./DescriptionEditor/DescriptionEditor";
 import SearchPlace from "./SearchPlace";
 
 type EventFormDetailsProps = {
@@ -214,21 +215,22 @@ type EventDescriptionFormProps = {
   update?: boolean;
   event?: Event;
   eventName: string;
-  onSubmit: (data: DescriptionInputs) => void;
+  onSubmit: (descriptionText: string) => void;
 };
 
 export const EventDescriptionForm: React.FC<EventDescriptionFormProps> = ({ update = false, event, eventName, onSubmit }) => {
-  const { register, handleSubmit: handleSubmit } = useForm<DescriptionInputs>({
-    defaultValues: { eventDescription: event?.eventDescription ? event.eventDescription : undefined },
-  });
+  const [descriptionText, setDescriptionText] = useState("");
+
+  const onClick = (): void => {
+    onSubmit(descriptionText);
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <>
       <h2>{eventName}</h2>
-      <FormLabel htmlFor="eventDescription">Event descripton</FormLabel>
-      <Textarea placeholder="Event descripton" {...register("eventDescription", { required: true })} />
-      <Input type="submit" title="submit" value={update ? "Update event" : "Save event"} />
-    </form>
+      <DescriptionEditor setDescription={setDescriptionText} event={event} />
+      <Button onClick={onClick}>{update ? "Update event" : "Save event"}</Button>
+    </>
   );
 };
 
