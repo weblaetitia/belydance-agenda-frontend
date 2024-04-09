@@ -22,7 +22,6 @@ import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import ExampleTheme from "./plugins/ExampleTheme";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import TreeViewPlugin from "./plugins/TreeViewPlugin";
 
 const getNodeFromDescription = (initialText: string): string => {
   const clean = initialText.replace(/"/g, "'"); // remove double quotes
@@ -124,7 +123,6 @@ const DescriptionEditor: React.FC<DescriptionEditorProps> = ({ event, setDescrip
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
-          <TreeViewPlugin />
           <AutoFocusPlugin />
           <CodeHighlightPlugin />
           <ListPlugin />

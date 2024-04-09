@@ -49,27 +49,10 @@ export function serialize(children: SerializedLexicalNode[]): string[] {
         case "linebreak":
           return "<br>";
         case "link":
-          // eslint-disable-next-line no-case-declarations
-          const attributes: {
-            doc?: any;
-            linkType?: "custom" | "internal";
-            newTab?: boolean;
-            nofollow?: boolean;
-            rel?: string;
-            sponsored?: boolean;
-            url?: string;
-          } = node.attributes;
-
-          if (attributes.linkType === "custom") {
-            return `<a href="${attributes.url}"${attributes.newTab ? " target=_'blank'" : ""} rel="${attributes?.rel ?? ""}${
-              attributes?.sponsored ? " sponsored" : ""
-            }${attributes?.nofollow ? " nofollow" : ""}">${serializedChildren}</a>`;
-          }
-
-          return `<a href="${getLinkForPage(attributes.doc)}"${attributes.newTab ? " target=_'blank'" : ""} rel="${attributes?.rel ?? ""}${
-            attributes?.sponsored ? " sponsored" : ""
-          }${attributes?.nofollow ? " nofollow" : ""}">${serializedChildren}</a>`; //TODO: Check doc link handling
-        case "list": //TODO handle properly, especially nested lists
+          return `<a href="${node.url}" target="_blank" rel="noreferrer" nofollow>${serializedChildren}</a>`;
+        case "autolink":
+          return `<a href="${node.url}" target="_blank" rel="noreferrer" nofollow>${serializedChildren}</a>`;
+        case "list":
           if (node.listType === "bullet") {
             return `
 						<ul class="list-disc mb-4 pl-8">
@@ -96,7 +79,4 @@ export function serialize(children: SerializedLexicalNode[]): string[] {
       }
     })
     .filter((node) => node !== null) as string[];
-}
-function getLinkForPage(doc: any) {
-  return "implement this";
 }
