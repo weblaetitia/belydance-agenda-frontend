@@ -89,6 +89,9 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
     setArtistSelected(artistSelected?.filter((artist) => artist.id !== artistToRemove.id));
   };
 
+  console.log(event?.startDate);
+  console.log(event?.endDate);
+
   return (
     <div>
       <form onSubmit={handleNext(onSubmit)}>
@@ -177,15 +180,19 @@ export const EventFormDetails: React.FC<EventFormDetailsProps> = ({ event, onNex
           <FormLabel>When does your event start and end? *</FormLabel>
           <Input type="date" id="startDate" {...register("startDate")} min="2023-03-01" />
           <Select placeholder="Starting hour" id="startHour" {...register("startHour")}>
-            <option value="00:00">00:00</option>
-            <option value="00:15">00:15</option>
-            <option value="00:30">00:30</option>
+            {generateHours().map((hour) => (
+              <option key={hour} value={hour}>
+                {hour}
+              </option>
+            ))}
           </Select>
           <Input type="date" id="endDate" {...register("endDate")} min="2023-03-01" />
           <Select placeholder="Ending hour" id="endHour" {...register("endHour")}>
-            <option value="00:00">00:00</option>
-            <option value="00:15">00:15</option>
-            <option value="00:30">00:30</option>
+            {generateHours().map((hour) => (
+              <option key={hour} value={hour}>
+                {hour}
+              </option>
+            ))}
           </Select>
           {/* FREE */}
           <FormLabel htmlFor="isFree">Is your event free?</FormLabel>
@@ -288,11 +295,23 @@ export type FacebookInput = {
 };
 
 const formatDate = (epoch: number): string => {
-  const date = new Date(epoch);
+  const date = new Date(epoch * 1000);
   return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`; //"YYYY-MM-DD"
 };
 
 const formatHour = (epoch: number): string => {
-  const date = new Date(epoch);
+  const date = new Date(epoch * 1000);
   return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+};
+
+const generateHours = (): string[] => {
+  const horaires = [];
+  for (let heure = 0; heure < 24; heure++) {
+    for (let minute = 0; minute < 60; minute += 10) {
+      const heureFormat = heure.toString().padStart(2, "0");
+      const minuteFormat = minute.toString().padStart(2, "0");
+      horaires.push(`${heureFormat}:${minuteFormat}`);
+    }
+  }
+  return horaires;
 };

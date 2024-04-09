@@ -28,6 +28,7 @@ const CreateEvent: React.FC = () => {
   useEffect(() => {
     const handleFacebookEvent = async (): Promise<void> => {
       if (facebookEvent != null) {
+        console.log(facebookEvent);
         // Fetch OSM
         let places = undefined;
         if (facebookEvent.location?.city) places = await searchOsmPlace(facebookEvent.location.city);
