@@ -25,17 +25,39 @@ import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import TreeViewPlugin from "./plugins/TreeViewPlugin";
 
 const getNodeFromDescription = (initialText: string): string => {
-  // clean initialText from /n
-  // Todo, create node after each line break /n
-  const clean = initialText.replace(/(\r\n|\n|\r)/gm, "");
-  return `{"root":
-  {"children":
-  [
-    {"children":[
-      {"detail":0,"format":0,"mode":"normal","style":"","text":"${clean}","type":"text","version":1}
-    ],   "direction":"ltr","format":"","indent":0,"type":"paragraph","version":1
-  }],
-  "direction":"ltr","format":"","indent":0,"type":"root","version":1}}`;
+  const clean = initialText.replace(/"/g, "'"); // remove double quotes
+  const splitedText = clean.split("\n");
+  const nodes = `{
+    "root": {
+      "children": [
+        ${splitedText.map(
+          (p, i) => `{
+            "children": [{"detail":0,"format":0,"mode":"normal","style":"","text":"${p}","type":"text","version":1}],
+            "direction":"ltr",
+            "format":"",
+            "indent":0,
+            "type":"paragraph",
+            "version":1
+          }${i === splitedText.length - 1 ? "," : ""}`
+        )}
+      {
+        "children": [{"detail":0,"format":0,"mode":"normal","style":"","text":"","type":"text","version":1}],
+        "direction":"ltr",
+        "format":"",
+        "indent":0,
+        "type":"paragraph",
+        "version":1
+      }
+    ],
+    "direction":"ltr",
+    "format":"",
+    "indent":0,
+    "type":"root",
+    "version":1
+  }
+}`;
+
+  return nodes;
 };
 
 // Catch any errors that occur during Lexical updates and log them
